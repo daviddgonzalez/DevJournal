@@ -2,7 +2,7 @@
 
 A CLI that prompts you for a weekly Friday journal entry and emails it to your boss.
 
-Built for the Avon Risk intern program but designed to work for any intern at any company — `devjournal init` configures your boss's email address, your SMTP credentials, and the cadence.
+Designed to work for any intern at any company — `devjournal init` configures your boss's email address, your SMTP credentials, and the cadence.
 
 ## Features
 
