@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { runCheckReminder } from './commands/checkReminder.js';
+import { runRemind } from './commands/remind.js';
 import { runInit } from './commands/init.js';
 import { runInstallSchedule } from './commands/installSchedule.js';
 import { runInstallSkill } from './commands/installSkill.js';
@@ -56,6 +57,17 @@ program
   .description('If today is Friday and this week\'s entry is not written, email yourself a reminder. Non-interactive.')
   .action(async () => {
     await runCheckReminder();
+  });
+
+program
+  .command('remind')
+  .description(
+    "Unconditionally send this week's reminder email. Reads config from environment " +
+      'variables (DEVJOURNAL_INTERN_NAME / DEVJOURNAL_INTERN_EMAIL / DEVJOURNAL_SMTP_USER / ' +
+      "DEVJOURNAL_SMTP_PASS). Intended for the GitHub Actions weekly job.",
+  )
+  .action(async () => {
+    await runRemind();
   });
 
 program
