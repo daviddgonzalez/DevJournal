@@ -1,0 +1,33 @@
+name: Weekly journal reminder
+
+on:
+  schedule:
+    # Fridays at 19:00 UTC (~3 PM US Eastern, EDT). Actions cron is UTC and best-effort.
+    - cron: '0 19 * * 5'
+  workflow_dispatch: {} # manual button for smoke-testing
+
+# Queue (don't cancel) if a manual run overlaps the scheduled one, so neither email is lost.
+concurrency:
+  group: reminder
+  cancel-in-progress: false
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    permissions: {} # this job uses no GITHUB_TOKEN
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Send reminder
+        run: node dist/cli.js remind
+        env:
+          DEVJOURNAL_INTERN_NAME: 'David Gonzalez'
+          DEVJOURNAL_INTERN_EMAIL: ${{ secrets.DEVJOURNAL_INTERN_EMAIL }}
+          DEVJOURNAL_SMTP_USER: ${{ secrets.DEVJOURNAL_SMTP_USER }}
+          DEVJOURNAL_SMTP_PASS: ${{ secrets.DEVJOURNAL_SMTP_PASS }}

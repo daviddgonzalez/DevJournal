@@ -1,0 +1,33 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-05-cloud-friday-reminder.md",
+  "tasks": [
+    {
+      "id": 7,
+      "subject": "Task 1: Make entryFilePath optional in mailer.ts",
+      "status": "completed",
+      "description": "**Goal:** Reminder email works with or without a local file path; omit the 'Open it: <path>' line when absent.\n\n**Files:** Modify src/mailer.ts; Test tests/mailer.test.ts\n\n**Verify:** npx vitest run tests/mailer.test.ts\n\n```json:metadata\n{\"files\": [\"src/mailer.ts\", \"tests/mailer.test.ts\"], \"verifyCommand\": \"npx vitest run tests/mailer.test.ts\", \"acceptanceCriteria\": [\"entryFilePath optional\", \"with path: 'Open it: <path>' present\", \"without path: no 'Open it:' line, has 'devjournal write' + name\", \"test+lint+typecheck pass\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 2: Add the devjournal remind command",
+      "status": "completed",
+      "blockedBy": [7],
+      "description": "**Goal:** Non-interactive unconditional reminder sender reading config from env vars, reusing createGmailTransport + sendReminder.\n\n**Files:** Create src/commands/remind.ts; Modify src/cli.ts; Test tests/remind.test.ts\n\n**Verify:** npx vitest run tests/remind.test.ts\n\n```json:metadata\n{\"files\": [\"src/commands/remind.ts\", \"src/cli.ts\", \"tests/remind.test.ts\"], \"verifyCommand\": \"npx vitest run tests/remind.test.ts\", \"acceptanceCriteria\": [\"readRemindEnv returns inputs / throws naming missing var\", \"buildReminder uses mostRecentFriday, omits entryFilePath\", \"runRemind wires env->build->transport->send\", \"remind command registered\", \"test+lint+typecheck pass\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 3: Add the GitHub Actions reminder workflow",
+      "status": "completed",
+      "blockedBy": [8],
+      "description": "**Goal:** Scheduled workflow runs `devjournal remind` every Friday, plus a manual workflow_dispatch trigger.\n\n**Files:** Create .github/workflows/reminder.yml\n\n**Verify:** node -e check that the file includes 'cron' and 'workflow_dispatch'\n\n```json:metadata\n{\"files\": [\".github/workflows/reminder.yml\"], \"verifyCommand\": \"node -e \\\"const y=require('node:fs').readFileSync('.github/workflows/reminder.yml','utf8'); if(!y.includes('cron')||!y.includes('workflow_dispatch')) throw new Error('missing triggers'); console.log('ok')\\\"\", \"acceptanceCriteria\": [\"schedule cron + workflow_dispatch\", \"builds + runs node dist/cli.js remind\", \"secrets for SMTP/email, literal intern name\", \"valid YAML\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 4: Roll out (manual, intern-driven, guided)",
+      "status": "pending",
+      "blockedBy": [9],
+      "description": "**Goal:** Wire up live secrets, prove end-to-end with a manual run, retire the superseded laptop task.\n\n**Files:** none (GitHub UI + local machine)\n\n**Verify:** Actions run green AND phone Gmail notification received.\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"manual: workflow_dispatch run green + phone Gmail notification received\", \"acceptanceCriteria\": [\"3 repo secrets exist\", \"manual run green AND email reaches phone\", \"devjournal-check-reminder deleted, devjournal-write kept\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-06"
+}
