@@ -11,16 +11,21 @@ interface CapturedMail {
   message: string;
 }
 
+function captureTransport() {
+  const transport = jsonTransport();
+  const captured: CapturedMail[] = [];
+  const original = transport.sendMail.bind(transport);
+  transport.sendMail = async (opts) => {
+    const r = (await original(opts)) as unknown as CapturedMail;
+    captured.push({ envelope: r.envelope, message: r.message });
+    return r;
+  };
+  return { transport, captured };
+}
+
 describe('sendEntry', () => {
   it('subject includes intern name and date', async () => {
-    const transport = jsonTransport();
-    const captured: CapturedMail[] = [];
-    const original = transport.sendMail.bind(transport);
-    transport.sendMail = async (opts) => {
-      const r = (await original(opts)) as unknown as CapturedMail;
-      captured.push({ envelope: r.envelope, message: r.message });
-      return r;
-    };
+    const { transport, captured } = captureTransport();
 
     await sendEntry(transport, {
       internName: 'David',
@@ -41,14 +46,7 @@ describe('sendEntry', () => {
 
 describe('sendReminder', () => {
   it('sends to intern only with reminder subject and entry path in body', async () => {
-    const transport = jsonTransport();
-    const captured: CapturedMail[] = [];
-    const original = transport.sendMail.bind(transport);
-    transport.sendMail = async (opts) => {
-      const r = (await original(opts)) as unknown as CapturedMail;
-      captured.push({ envelope: r.envelope, message: r.message });
-      return r;
-    };
+    const { transport, captured } = captureTransport();
 
     await sendReminder(transport, {
       internName: 'David',
@@ -67,14 +65,7 @@ describe('sendReminder', () => {
   });
 
   it('omits the "Open it" path line when entryFilePath is not provided', async () => {
-    const transport = jsonTransport();
-    const captured: CapturedMail[] = [];
-    const original = transport.sendMail.bind(transport);
-    transport.sendMail = async (opts) => {
-      const r = (await original(opts)) as unknown as CapturedMail;
-      captured.push({ envelope: r.envelope, message: r.message });
-      return r;
-    };
+    const { transport, captured } = captureTransport();
 
     await sendReminder(transport, {
       internName: 'David',
