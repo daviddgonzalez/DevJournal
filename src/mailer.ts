@@ -17,7 +17,7 @@ export interface ReminderEmail {
   internName: string;
   internEmail: string;
   fridayDate: string;
-  entryFilePath: string;
+  entryFilePath?: string;
 }
 
 export type AnyTransporter = Transporter<unknown> | Transporter;
@@ -43,17 +43,17 @@ export async function sendEntry(transport: AnyTransporter, email: EntryEmail): P
 
 export async function sendReminder(transport: AnyTransporter, email: ReminderEmail): Promise<void> {
   const subject = `Reminder: write this week's journal (${email.fridayDate})`;
-  const text = [
+  const lines = [
     `Hey ${email.internName},`,
     '',
     `It's Friday and your journal entry for ${email.fridayDate} isn't done yet.`,
     '',
-    `Open it: ${email.entryFilePath}`,
-    '',
-    `Or run: devjournal write`,
-    '',
-    `— devjournal`,
-  ].join('\n');
+  ];
+  if (email.entryFilePath) {
+    lines.push(`Open it: ${email.entryFilePath}`, '');
+  }
+  lines.push('Write it: devjournal write', 'Send it:  devjournal send', '', '— devjournal');
+  const text = lines.join('\n');
   await transport.sendMail({
     from: `"devjournal" <${email.internEmail}>`,
     to: email.internEmail,
